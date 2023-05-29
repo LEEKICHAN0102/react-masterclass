@@ -8,6 +8,7 @@ const Container =styled.div`
   margin: 0 auto;
 `;
 
+
 const Header =styled.header`
   height:10vh;
   display:flex;
@@ -27,9 +28,10 @@ const Coin =styled.li`
   margin-bottom:10px;
   font-weight:600;
   a{
+    display:flex;
+    align-items:center;
     padding:10px;
     transition:color .2s ease-in-out;
-    display:block;
   }
   &:hover{
     a{
@@ -39,6 +41,7 @@ const Coin =styled.li`
 `;
 
 const Title = styled.h1`
+  margin-top:30px;
   font-size:48px;
   color:${props=>props.theme.accentColor};
 `;
@@ -47,6 +50,13 @@ const Loader=styled.div`
   text-align:center;
   align-items:center;
   display:block;
+  margin-top:30px;
+`;
+
+const Img=styled.img`
+  width:35px;
+  height:35px;
+  margin-right:10px;
 `;
 
 const coins=[
@@ -109,7 +119,16 @@ function Coins(){
     <CoinList>
       {coins.map((coin) => (
           <Coin key={coin.id}>
-            <Link to={`/${coin.id}`}>{coin.name} &rarr;</Link>
+            <Link to={{
+              pathname:`/${coin.id}`,
+              state:{name:coin.name},
+
+            }}>
+                <Img 
+                  src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}
+                />  
+                {coin.name} &rarr;
+              </Link>
           </Coin>
       ))}
     </CoinList>}
