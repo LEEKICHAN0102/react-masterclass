@@ -113,7 +113,7 @@ function Coins(){
   },[]);
   return <Container>
     <Header>
-      <Title>💰 코인 💰</Title>
+      <Title>Coin API</Title>
     </Header>
     {loading ? <Loader>코인 불러오는 중</Loader>:
     <CoinList>

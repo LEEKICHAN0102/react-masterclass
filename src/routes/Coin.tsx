@@ -1,11 +1,35 @@
 import {useState,useEffect} from "react";
-import {Switch,Route, useLocation, useParams } from "react-router-dom";
+import {Switch,Route, useLocation, useParams,useRouteMatch } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+import Chart from "./Chart";
+import Price from "./Price";
 
 const Container =styled.div`
   padding:0px 20px;
   max-width:480px;
   margin: 0 auto;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span<{isActive:boolean}>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color:${props=>props.isActive? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
 `;
 
 const Overview = styled.div`
@@ -122,6 +146,8 @@ function Coin(){
   const {state}=useLocation<RouteState>();
   const [info, setInfo] = useState<InfoData>();
   const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const priceMatch=useRouteMatch(`/${coinId}/price`);
+  const chartMatch=useRouteMatch(`/${coinId}/chart`);
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -173,6 +199,24 @@ function Coin(){
               <span>{priceInfo?.max_supply}</span>
             </OverviewItem>
           </Overview>
+
+          <Tabs>
+            <Tab isActive={chartMatch!==null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={priceMatch!==null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+
+          <Switch>
+            <Route path={`/${coinId}/price`}>
+              <Price />
+            </Route>
+            <Route path={`/${coinId}/chart`}>
+              <Chart />
+            </Route>
+          </Switch>
         </>
       )}
   </Container>
