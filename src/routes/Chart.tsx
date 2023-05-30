@@ -18,7 +18,11 @@ interface IHistorical {
 }
 
 function Chart({coinId}:ChartProps){
-  const {isLoading,data}=useQuery<IHistorical[]>(["ohlcv",coinId],()=>fetchCoinHistory(coinId));
+  const {isLoading,data}=useQuery<IHistorical[]>(["ohlcv",coinId],()=>fetchCoinHistory(coinId),
+    {
+      refetchInterval:10000,
+    }
+  );
   return <div>
       {isLoading ? "차트 로딩중...":
       <ApexChart 
