@@ -2,6 +2,8 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container =styled.div`
   padding:0px 20px;
@@ -22,12 +24,13 @@ const CoinList =styled.ul`
 `;
 
 const Coin =styled.li`
-  background-color:white;
-  color:${props=>props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBgColor};
+  color: ${(props) => props.theme.textColor};
   padding:20px;
   border-radius:15px;
   margin-bottom:10px;
   font-weight:600;
+  border: 1px solid white;
   a{
     display:flex;
     align-items:center;
@@ -60,36 +63,6 @@ const Img=styled.img`
   margin-right:10px;
 `;
 
-const coins=[
-  {
-    id: "btc-bitcoin",
-    name: "Bitcoin",
-    symbol: "BTC",
-    rank: 1,
-    is_new: false,
-    is_active: true,
-    type: "coin",
-    },
-    {
-    id: "eth-ethereum",
-    name: "Ethereum",
-    symbol: "ETH",
-    rank: 2,
-    is_new: false,
-    is_active: true,
-    type: "coin",
-    },
-    {
-    id: "hex-hex",
-    name: "HEX",
-    symbol: "HEX",
-    rank: 3,
-    is_new: false,
-    is_active: true,
-    type: "token",
-    }
-  ];
-
 interface ICoin {
   id: string,
   name: string,
@@ -102,10 +75,13 @@ interface ICoin {
 
 
 function Coins(){
+  const setDarkAtom=useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom=()=> setDarkAtom((prev)=>!prev);
   const {isLoading,data}=useQuery<ICoin[]>("allCoins", fetchCoins); //Replaced by react-query!!
   return <Container>
     <Header>
       <Title>Coin API</Title>
+      <button onClick={toggleDarkAtom}>Toggle Mode</button>
     </Header>
     {isLoading ? <Loader>코인 불러오는 중</Loader>:
     <CoinList>
@@ -114,7 +90,6 @@ function Coins(){
             <Link to={{
               pathname:`/${coin.id}`,
               state:{name:coin.name},
-
             }}>
                 <Img 
                   src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}
@@ -128,3 +103,7 @@ function Coins(){
 }
 
 export default Coins;
+
+
+
+
