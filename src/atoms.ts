@@ -1,6 +1,1 @@
-import { atom } from "recoil";
-
-export const isDarkAtom=atom({
-  key:"isDark",
-  default:true,
-})
+import {atom ,selector} from "recoil";
