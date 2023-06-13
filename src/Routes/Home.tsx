@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
@@ -124,7 +124,7 @@ const infoVariants={
 const BigMovie=styled(motion.div)`
   position:fixed;
   width:70vW;
-  height:80vh;
+  height:85vh;
   background-color:${props=>props.theme.black.lighter};
   top:100px;
   left: 0;
@@ -165,7 +165,7 @@ const BigOverView=styled.p`
   position:relative;
   z-index:1;
   top:50%;
-  width:90%;
+  width:100%;
 `;
 
 const BigMovieDetail=styled.div`
@@ -175,6 +175,34 @@ const BigMovieDetail=styled.div`
   position:relative;
   z-index:1;
   top:50%;
+  align-items:center;
+  justify-content:space-evenly;
+`;
+
+const BigMovieTrailer=styled(motion.div)`
+  background-color:${props=>props.theme.white.lighter};
+  position:relative;
+  padding:20px;
+  z-index:1;
+  top:50%;
+  border-radius:10px;
+  color:black;
+  font-size:20px;
+  font-weight:500;
+  cursor: pointer;
+`;
+
+const BigMovieMore=styled.div`
+    background-color:${props=>props.theme.white.lighter};
+  position:relative;
+  padding:20px;
+  z-index:1;
+  top:50%;
+  border-radius:10px;
+  color:black;
+  font-size:20px;
+  font-weight:500;
+  cursor: pointer;
 `;
 
 
@@ -213,7 +241,8 @@ function Home () {
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
-  console.log(clickedMovie);
+
+  
   return (
     <Wrapper>
       {isLoading?<Loader>Loading...</Loader>:
@@ -281,6 +310,8 @@ function Home () {
                       <BigMovieDetail>
                         ⭐{clickedMovie.vote_average}
                         🥰{clickedMovie.vote_count}
+                        <BigMovieTrailer> 🍟 Movie's Trailer!</BigMovieTrailer>
+                        <BigMovieMore> 🥤 More Information</BigMovieMore>
                       </BigMovieDetail>
                   </>
                 }
