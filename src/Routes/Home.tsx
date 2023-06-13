@@ -121,6 +121,72 @@ const infoVariants={
   }
 };
 
+const BigMovie=styled(motion.div)`
+  position:fixed;
+  width:70vW;
+  height:80vh;
+  background-color:${props=>props.theme.black.lighter};
+  top:100px;
+  left: 0;
+  right:0;
+  margin:0 auto;
+  border-radius:30px;
+  overflow:hidden;
+`;
+
+const BigCover=styled.div`
+  width:100%;
+  height:100%;
+  background-size:cover;
+  background-position:center center;
+  position:absolute;
+`;
+
+const BigTitle=styled.h3`
+  color:${props=>props.theme.white.lighter};
+  padding:20px;
+  font-size:28px;
+  position:relative;
+  z-index:1;
+  top:50%;
+`;
+
+const BigReleaseData =styled.span`
+  color:${props=>props.theme.white.lighter};
+  padding:20px;
+  position:relative;
+  z-index:1;
+  top:48%;
+`;
+
+const BigOverView=styled.p`
+  color:${props=>props.theme.white.lighter};
+  padding:20px;
+  position:relative;
+  z-index:1;
+  top:50%;
+  width:90%;
+`;
+
+const BigMovieDetail=styled.div`
+  display:flex;
+  color:${props=>props.theme.white.lighter};
+  padding:20px;
+  position:relative;
+  z-index:1;
+  top:50%;
+`;
+
+
+const Overlay=styled(motion.div)`
+  position:fixed;
+  top:0;
+  bottom:100%;
+  width:100%;
+  height:100%;
+  background-color:rgba(0,0,0,0.5);
+  opacity:0;
+`;
 
 
 function Home () {
@@ -140,12 +206,14 @@ function Home () {
   const toggleLeaving=()=>setLeaving(prev=>!prev);
   const history=useHistory();
   const bigMovieMatch=useRouteMatch<{movieId:string}>("/movies/:movieId");
-  console.log(bigMovieMatch);
   const onBoxClicked=(movieId:number)=>{
     history.push(`movies/${movieId}`);
-
   }
-
+  const onOverlayClick=()=>history.push("/");
+  const clickedMovie =
+    bigMovieMatch?.params.movieId &&
+    data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
+  console.log(clickedMovie);
   return (
     <Wrapper>
       {isLoading?<Loader>Loading...</Loader>:
@@ -189,15 +257,40 @@ function Home () {
           </AnimatePresence>
         </Slider>
         <AnimatePresence>
-          {bigMovieMatch?
-            <motion.div layoutId={bigMovieMatch.params.movieId} style={{position:"absolute",width:"40vW",height:"80vh",backgroundColor:"red",
-            top:200,
-            left: 200,
-            margin:"0 auto"
-          }}/>:null
+          {bigMovieMatch?(
+            <>
+              <Overlay 
+                onClick={onOverlayClick} 
+                animate={{opacity:1}}
+                exit={{opacity:0}} 
+              />
+              <BigMovie layoutId={bigMovieMatch.params.movieId} >
+                {clickedMovie && 
+                  <>
+                    <BigCover
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                            clickedMovie.backdrop_path,
+                            "original"
+                          )})`,
+                        }}
+                        />
+                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigReleaseData>{clickedMovie.release_date}</BigReleaseData>
+                      <BigOverView>{clickedMovie.overview}</BigOverView>
+                      <BigMovieDetail>
+                        ⭐{clickedMovie.vote_average}
+                        🥰{clickedMovie.vote_count}
+                      </BigMovieDetail>
+                  </>
+                }
+              </BigMovie>
+            </> 
+            ) :null
           }
         </AnimatePresence>
-      </>}
+      </>
+      }
     </Wrapper>
   )
 }
