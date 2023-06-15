@@ -14,6 +14,7 @@ const Nav = styled(motion.nav)`
   font-size: 14px;
   padding: 20px 60px;
   color: white;
+  z-index:99;
 `;
 
 const navVariants={
@@ -116,7 +117,8 @@ function Header() {
   const [searchOpen,setSearchOpen]=useState(false);
   const toggleSearch=()=>{setSearchOpen((prev)=>!prev)};
   const homeMatch=useRouteMatch("/");
-  const tvMatch=useRouteMatch("/tv");
+  const NowMatch=useRouteMatch("/now-playing");
+  const ComingMatch=useRouteMatch("/coming-soon");
   const navAnimation=useAnimation();
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -153,12 +155,17 @@ function Header() {
         <Items>
           <Link to="/">
             <Item>
-              Home {homeMatch?.isExact &&<Circle layoutId="circle" />}
+              Popular {homeMatch?.isExact &&<Circle layoutId="circle" />}
             </Item>
           </Link>
-          <Link to="/tv">
+          <Link to="/now-playing">
             <Item>
-              Tv Shows {tvMatch && <Circle layoutId="circle" />}
+              Now PLAYING {NowMatch && <Circle layoutId="circle" />}
+            </Item>
+          </Link>
+          <Link to="/coming-soon">
+            <Item>
+              Coming SOON {ComingMatch && <Circle layoutId="circle" />}
             </Item>
           </Link>
         </Items>

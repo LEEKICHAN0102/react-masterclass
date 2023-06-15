@@ -2,7 +2,7 @@ import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
-import {getMovies,IGetMoviesResult} from "../api";
+import {getPopularMovies,IGetMoviesResult} from "../api";
 import { makeImagePath } from "../utils";
 import {useRouteMatch, useHistory } from "react-router-dom";
 
@@ -45,8 +45,9 @@ const Slider=styled.div`
 
 const Row=styled(motion.div)`
   display:grid;
-  gap:5px;
-  grid-template-columns:repeat(6,1fr);
+  gap:100px;
+  padding:50px 150px;
+  grid-template-columns:repeat(3,1fr);
   position:absolute;
   width:100%;
 `;
@@ -67,12 +68,14 @@ const rowVariants={
 const offset=6;
 
 const Box = styled(motion.div)<{bgPhoto:string}>`
+  position: relative;
   background-color:white;
   background-image:url(${props=>props.bgPhoto});
   background-size:cover;
   background-position:center center;
-  height:150px;
+  height:400px;
   color:white;
+  border-radius:20px;
   cursor:pointer;
   &:first-child{
     transform-origin:center left;
@@ -88,35 +91,29 @@ const boxVariants={
   },
   hover:{
     y:-50,
-    scale:1.3,
     transition:{
-      delay:0.5,
+      delay:0.1,
       duration:0.2,
-      type:"tween"
     }
   },
 }
 
 const Info=styled(motion.div)`
   padding:5px;
-  background-color:${props=>props.theme.black.lighter};
-  opacity:0;
-  position:absolute;
   width:100%;
+  position: absolute;
   bottom:0;
   h4{
     text-align:center;
-    font-size:12px;
+    font-size:20px;
   }
 `;
 
 const infoVariants={
   hover:{
-    opacity:1,
     transition:{
-      delay:0.5,
-      duration:0.2,
-      type:"tween"
+      delay:0.1,
+      duration:0.1,
     }
   }
 };
@@ -217,8 +214,8 @@ const Overlay=styled(motion.div)`
 `;
 
 
-function Home () {
-  const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","nowPlaying"],getMovies);
+function Popular () {
+  const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","Popular"],getPopularMovies);
   const [index,setIndex]=useState(0);
   const increaseIndex=()=>{
     if(data){
@@ -263,22 +260,19 @@ function Home () {
               }}
               exit="exit"
               key={index}>
-              {data?.results.slice(1)
-              .slice(offset*index,offset*index+offset)
-              .map((movie)=>
+              {data?.results.slice(1).map((movie)=>
               <Box 
                 layoutId={String(movie.id)}
                 key={movie.id} 
                 onClick={()=>onBoxClicked(movie.id)}
-                bgPhoto={makeImagePath(movie.backdrop_path,"w500")}
+                bgPhoto={makeImagePath(movie.backdrop_path,"original")}
                 variants={boxVariants}
                 whileHover="hover"
                 initial="normal"
                 transition={{type:"tween"}}
-                ><Info 
-                  variants={infoVariants}
-                  >
-                  <h4>{movie.title}</h4>
+                >
+                  <Info variants={infoVariants}>
+                    <h4>{movie.title}</h4>
                   </Info>
                 </Box>
               )}
@@ -326,4 +320,4 @@ function Home () {
   )
 }
 
-export default Home;
+export default Popular;
