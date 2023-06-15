@@ -18,13 +18,13 @@ const Loader=styled.div`
   align-items:center;
 `;
 
-const Banner=styled.div<{bgPhoto:string}>`
+const Banner=styled.div<{bgphoto:string}>`
   height:100vh;
   display:flex;
   flex-direction:column;
   justify-content:center;
   padding:60px;
-  background-image:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,1)), url(${(props)=>props.bgPhoto});
+  background-image:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,1)), url(${(props)=>props.bgphoto});
   background-size:cover;
 `;
 
@@ -67,10 +67,10 @@ const rowVariants={
 
 const offset=6;
 
-const Box = styled(motion.div)<{bgPhoto:string}>`
+const Box = styled(motion.div)<{bgphoto:string}>`
   position: relative;
   background-color:white;
-  background-image:url(${props=>props.bgPhoto});
+  background-image:url(${props=>props.bgphoto});
   background-size:cover;
   background-position:center center;
   height:400px;
@@ -244,7 +244,7 @@ function Coming () {
     <Wrapper>
       {isLoading?<Loader>Loading...</Loader>:
       <>
-        <Banner onClick={increaseIndex} bgPhoto={makeImagePath(data?.results[0].backdrop_path||"")}>
+        <Banner onClick={increaseIndex} bgphoto={makeImagePath(data?.results[0].backdrop_path||"")}>
           <Title>{data?.results[0].title}</Title>
           <OverView>{data?.results[0].overview}</OverView>
         </Banner>
@@ -265,7 +265,7 @@ function Coming () {
                 layoutId={String(movie.id)}
                 key={movie.id} 
                 onClick={()=>onBoxClicked(movie.id)}
-                bgPhoto={makeImagePath(movie.backdrop_path,"original")}
+                bgphoto={makeImagePath(movie.backdrop_path,"original")}
                 variants={boxVariants}
                 whileHover="hover"
                 initial="normal"

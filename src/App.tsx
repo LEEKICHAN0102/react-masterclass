@@ -6,24 +6,26 @@ import Search from "./Routes/Search";
 import Header from "./Components/Header";
 
 
-function App(){
-  return <Router>
-    <Header/>
-    <Switch>
-      <Route path={["/","/movies/:movieId"]}>
-        <Popular/>
-      </Route>
-      <Route path={["/now-playing","/movies/:movieId"]}>
-        <Now/>
-      </Route>
-      <Route path={["/coming-soon","/movies/:movieId"]}>
-        <Coming/>
-      </Route>
-      <Route path="/search">
-        <Search/>
-      </Route>
-    </Switch>
-  </Router>
+function App() {
+  return (
+    <Router>
+      <Header />
+      <Switch>
+        <Route exact path={["/", "/movies/:movieId"]}>
+          <Popular />
+        </Route>
+        <Route path="/now-playing">
+          <Now />
+        </Route>
+        <Route path="/coming-soon">
+          <Coming />
+        </Route>
+        <Route path="/search">
+          <Search />
+        </Route>
+      </Switch>
+    </Router>
+  );
 }
 
 export default App;

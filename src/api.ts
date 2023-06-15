@@ -36,10 +36,7 @@ export function getPopularMovies(){
 }
 
 export function getUpcomingMovies(){
-  return fetch(`${BASE_PATH}/movie/upcoming?api_key=${API_KEY}`)
-  .then((response) => response.json())
-  .then((data) => {
-    console.log(data); // 응답 데이터 출력
-    return data;
-  });
+  return fetch(`${BASE_PATH}/movie/upcoming?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  )
 }
