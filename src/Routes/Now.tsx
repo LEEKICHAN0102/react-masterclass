@@ -2,7 +2,7 @@ import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
-import {getMovies,IGetMoviesResult} from "../api";
+import {getNowMovies,IGetMoviesResult} from "../api";
 import { makeImagePath } from "../utils";
 import {useRouteMatch, useHistory } from "react-router-dom";
 
@@ -215,7 +215,7 @@ const Overlay=styled(motion.div)`
 
 
 function Now () {
-  const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","now-playing"],getMovies);
+  const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","now-playing"],getNowMovies);
   const [index,setIndex]=useState(0);
   const increaseIndex=()=>{
     if(data){
@@ -232,7 +232,7 @@ function Now () {
   const history=useHistory();
   const bigMovieMatch=useRouteMatch<{movieId:string}>("/movies/:movieId");
   const onBoxClicked=(movieId:number)=>{
-    history.push(`movies/${movieId}`);
+    history.push(`/movies/${movieId}`);
   }
   const onOverlayClick=()=>{
     history.push("/now-playing");
@@ -267,7 +267,7 @@ function Now () {
                 layoutId={String(movie.id)}
                 key={movie.id} 
                 onClick={()=>onBoxClicked(movie.id)}
-                bgphoto={makeImagePath(movie.backdrop_path,"original")}
+                bgphoto={makeImagePath(movie.poster_path,"original")}
                 variants={boxVariants}
                 whileHover="hover"
                 initial="normal"

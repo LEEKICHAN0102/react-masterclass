@@ -232,9 +232,9 @@ function Coming () {
   const history=useHistory();
   const bigMovieMatch=useRouteMatch<{movieId:string}>("/movies/:movieId");
   const onBoxClicked=(movieId:number)=>{
-    history.push(`movies/${movieId}`);
+    history.push(`/movies/${movieId}`);
   }
-  const onOverlayClick=()=>history.push("/");
+  const onOverlayClick=()=>history.push("coming-soon");
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
@@ -265,7 +265,7 @@ function Coming () {
                 layoutId={String(movie.id)}
                 key={movie.id} 
                 onClick={()=>onBoxClicked(movie.id)}
-                bgphoto={makeImagePath(movie.backdrop_path,"original")}
+                bgphoto={makeImagePath(movie.poster_path,"original")}
                 variants={boxVariants}
                 whileHover="hover"
                 initial="normal"
