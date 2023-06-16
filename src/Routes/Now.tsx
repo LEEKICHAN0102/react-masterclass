@@ -241,7 +241,6 @@ function Now () {
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
 
-  
   return (
     <Wrapper>
       {isLoading?<Loader>Loading...</Loader>:

@@ -23,6 +23,16 @@ export interface IGetMoviesResult {
   total_results:number;
 }
 
+export interface ITrailer {
+  key:string
+}
+
+export interface IGetTrailerResult{
+  id:number;
+  results:ITrailer[]
+}
+
+
 export function getPopularMovies(){
   return fetch(`${BASE_PATH}/movie/popular?api_key=${API_KEY}`).then(
     (response)=>response.json()
@@ -39,5 +49,11 @@ export function getNowMovies(){
 export function getUpcomingMovies(){
   return fetch(`${BASE_PATH}/movie/upcoming?api_key=${API_KEY}`).then(
     (response) => response.json()
+  )
+}
+
+export function getTrailerMovies (id:number){
+  return fetch(`${BASE_PATH}/movie/${id}/videos?api_key=${API_KEY}`).then(
+    (response)=>response.json()
   )
 }

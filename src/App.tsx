@@ -14,10 +14,10 @@ function App() {
         <Route exact path={["/", "/movies/:movieId"]}>
           <Popular />
         </Route>
-        <Route path="/now-playing">
+        <Route path="/now-playing" component={Now}>
           <Now />
         </Route>
-        <Route path="/coming-soon">
+        <Route path="/coming-soon" component={Coming}>
           <Coming />
         </Route>
         <Route path="/search">

@@ -2,9 +2,10 @@ import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
-import {getPopularMovies,IGetMoviesResult} from "../api";
+import {getPopularMovies, IGetMoviesResult ,getTrailerMovies, IGetTrailerResult} from "../api";
 import { makeImagePath } from "../utils";
 import {useRouteMatch, useHistory } from "react-router-dom";
+import YouTube from "react-youtube";
 
 const Wrapper=styled.div`
   background-color:black;
@@ -53,17 +54,16 @@ const Row=styled(motion.div)`
 `;
 
 const rowVariants={
-  hidden:{
-    x:window.outerWidth+5,
-  },
-  visible:{
-    x:0,
-  },
-  exit:{
-    x:-window.outerWidth-5
-  },
+  hidden: { opacity: 1, scale: 0 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delayChildren: 0.3,
+      staggerChildren: 0.2
+    }
+  }
 }
-
 
 const offset=6;
 
@@ -76,6 +76,7 @@ const Box = styled(motion.div)<{bgphoto:string}>`
   height:400px;
   color:white;
   border-radius:20px;
+  box-shadow: 0 2px 3px ${props=>props.theme.white.lighter};
   cursor:pointer;
   &:first-child{
     transform-origin:center left;
@@ -86,8 +87,10 @@ const Box = styled(motion.div)<{bgphoto:string}>`
 `;
 
 const boxVariants={
-  normal:{
-    scale:1,
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1
   },
   hover:{
     y:-50,
@@ -216,7 +219,12 @@ const Overlay=styled(motion.div)`
 
 function Popular () {
   const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","Popular"],getPopularMovies);
+  const trailerMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
+  const id = trailerMatch?.params.movieId;
+  const {data:trailerData,isLoading:isTrailerLoading}=useQuery<IGetTrailerResult>(["movies","trailer",id],()=>getTrailerMovies(Number(id)));
+
   const [index,setIndex]=useState(0);
+  const [openMovie,setOpenMovie]=useState(false);
   const increaseIndex=()=>{
     if(data){
       if(leaving) return
@@ -267,7 +275,8 @@ function Popular () {
                 bgphoto={makeImagePath(movie.poster_path,"original")}
                 variants={boxVariants}
                 whileHover="hover"
-                initial="normal"
+                initial="hidden"
+                animate="visible"
                 transition={{type:"tween"}}
                 >
                   <Info variants={infoVariants}>
@@ -303,7 +312,13 @@ function Popular () {
                       <BigMovieDetail>
                         ⭐{clickedMovie.vote_average}
                         🥰{clickedMovie.vote_count}
-                        <BigMovieTrailer> 🍟 Movie's Trailer!</BigMovieTrailer>
+                          <BigMovieTrailer onClick={()=>setOpenMovie(true)}>
+                            🍟 Movie's Trailer!
+                          </BigMovieTrailer>
+                        {openMovie&&  (
+                          <YouTube  videoId="" />
+                        )
+                        }
                         <BigMovieMore> 🥤 More Information</BigMovieMore>
                       </BigMovieDetail>
                   </>
