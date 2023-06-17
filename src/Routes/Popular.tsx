@@ -188,10 +188,12 @@ const BigMovieDetail=styled.li`
 
 const BigMovieTrailer=styled(motion.div)`
   background-color:${props=>props.theme.white.lighter};
+  text-align:center;
+  margin-top:15px;
+  width:100%;
   position:relative;
   padding:20px;
   z-index:1;
-  top:50%;
   border-radius:10px;
   color:black;
   font-size:20px;
@@ -321,9 +323,11 @@ function Popular () {
                           <BigMovieDetail>
                             Vote Count : 🥰{clickedMovie.vote_count}
                           </BigMovieDetail>
-                          <BigMovieTrailer onClick={()=>setOpenMovie(true)}>
-                            🥤 Movie's Trailer!
-                          </BigMovieTrailer>
+                          <BigMovieDetail>
+                            <BigMovieTrailer onClick={()=>setOpenMovie(true)}>
+                              🥤 Movie's Trailer!
+                            </BigMovieTrailer>
+                          </BigMovieDetail>
                         {openMovie &&  (
                             <YouTube  videoId={trailerData?.results[0].key} />
                           )
