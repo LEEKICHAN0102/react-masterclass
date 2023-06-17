@@ -2,7 +2,7 @@ import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
-import {getPopularMovies, IGetMoviesResult ,getTrailerMovies, IGetTrailerResult} from "../api";
+import {getPopularMovies, IGetMoviesResult, getTrailerMovies, IGetTrailerResult} from "../api";
 import { makeImagePath } from "../utils";
 import {useRouteMatch, useHistory } from "react-router-dom";
 import YouTube from "react-youtube";
@@ -148,52 +148,46 @@ const BigTitle=styled.h3`
   font-size:28px;
   position:relative;
   z-index:1;
-  top:50%;
+  top:30%;
 `;
 
-const BigReleaseData =styled.span`
+const BigReleaseDate =styled.span`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:48%;
+  top:30%;
 `;
+
 
 const BigOverView=styled.p`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:50%;
-  width:100%;
+  top:30%;
+  width:85%;
 `;
 
-const BigMovieDetail=styled.div`
-  display:flex;
+const BigMovieDetails=styled.ul`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:50%;
+  top:25%;
   align-items:center;
-  justify-content:space-evenly;
+`;
+
+const BigMovieDetail=styled.li`
+  color: ${(props) => props.theme.white.darker};
+  position:relative;
+  z-index:1;
+  align-items:center;
+  list-style-type:none;
 `;
 
 const BigMovieTrailer=styled(motion.div)`
   background-color:${props=>props.theme.white.lighter};
-  position:relative;
-  padding:20px;
-  z-index:1;
-  top:50%;
-  border-radius:10px;
-  color:black;
-  font-size:20px;
-  font-weight:500;
-  cursor: pointer;
-`;
-
-const BigMovieMore=styled.div`
-    background-color:${props=>props.theme.white.lighter};
   position:relative;
   padding:20px;
   z-index:1;
@@ -218,9 +212,10 @@ const Overlay=styled(motion.div)`
 
 function Popular () {
   const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","Popular"],getPopularMovies);
-  // const trailerMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  // const id = trailerMatch?.params.movieId;
-  // const {data:trailerData,isLoading:isTrailerLoading}=useQuery<IGetTrailerResult>(["movies","trailer",id],()=>getTrailerMovies(Number(id)));
+  const trailerMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
+  const id = trailerMatch?.params.movieId;
+  const {data:trailerData,isLoading:isTrailerLoading}=useQuery<IGetTrailerResult>(["movies","trailer",id],()=>getTrailerMovies(Number(id)));
+
 
   const [index,setIndex]=useState(0);
   const [openMovie,setOpenMovie]=useState(false);
@@ -306,20 +301,35 @@ function Popular () {
                         }}
                         />
                       <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigReleaseData>{clickedMovie.release_date}</BigReleaseData>
+                      <BigReleaseDate>{clickedMovie.release_date}</BigReleaseDate>
                       <BigOverView>{clickedMovie.overview}</BigOverView>
-                      <BigMovieDetail>
-                        ⭐{clickedMovie.vote_average}
-                        🥰{clickedMovie.vote_count}
+                      {isTrailerLoading?
+                        <Loader>Loading...</Loader >:
+                        <BigMovieDetails>
+                          <BigMovieDetail>
+                            Original Language : {clickedMovie.original_language}
+                          </BigMovieDetail>
+                          <BigMovieDetail>
+                            Popularity : 💖 {clickedMovie.popularity}
+                          </BigMovieDetail>
+                          <BigMovieDetail>
+                            Movie's Runtime : {clickedMovie.runtime} Min
+                          </BigMovieDetail>
+                          <BigMovieDetail>
+                            Vote Average : ⭐{clickedMovie.vote_average}
+                          </BigMovieDetail>
+                          <BigMovieDetail>
+                            Vote Count : 🥰{clickedMovie.vote_count}
+                          </BigMovieDetail>
                           <BigMovieTrailer onClick={()=>setOpenMovie(true)}>
-                            🍟 Movie's Trailer!
+                            🥤 Movie's Trailer!
                           </BigMovieTrailer>
-                        {openMovie&&  (
-                          <YouTube  videoId="" />
-                        )
+                        {openMovie &&  (
+                            <YouTube  videoId={trailerData?.results[0].key} />
+                          )
                         }
-                        <BigMovieMore> 🥤 More Information</BigMovieMore>
-                      </BigMovieDetail>
+                      </BigMovieDetails>
+                      }
                   </>
                 }
               </BigMovie>

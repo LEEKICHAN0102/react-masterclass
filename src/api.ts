@@ -4,10 +4,14 @@ const BASE_PATH="https://api.themoviedb.org/3";
 interface IMovie {
   backdrop_path:string;
   poster_path:string;
+  budget:number;
   title:string;
   overview:string;
   id:number;
   genres:string[];
+  original_language:string;
+  popularity:number;
+  runtime:number;
   release_date:string;
   vote_average:number;
   vote_count:number;
@@ -24,14 +28,14 @@ export interface IGetMoviesResult {
 }
 
 export interface ITrailer {
-  key:string
+  key: string;
+  type: "Trailer";
 }
 
 export interface IGetTrailerResult{
   id:number;
   results:ITrailer[]
 }
-
 
 export function getPopularMovies(){
   return fetch(`${BASE_PATH}/movie/popular?api_key=${API_KEY}`).then(

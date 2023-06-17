@@ -148,7 +148,7 @@ const BigTitle=styled.h3`
   top:50%;
 `;
 
-const BigReleaseData =styled.span`
+const BigReleaseDate =styled.span`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
@@ -301,7 +301,7 @@ function Coming () {
                         }}
                         />
                       <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigReleaseData>{clickedMovie.release_date}</BigReleaseData>
+                      <BigReleaseDate>{clickedMovie.release_date}</BigReleaseDate>
                       <BigOverView>{clickedMovie.overview}</BigOverView>
                       <BigMovieDetail>
                         ⭐{clickedMovie.vote_average}
