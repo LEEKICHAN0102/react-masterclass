@@ -17,7 +17,13 @@ function App() {
         <Route path="/now-playing" component={Now}>
           <Now />
         </Route>
+        <Route path="/now-playing/movie/:movieId" component={Now}>
+          <Now />
+        </Route>
         <Route path="/coming-soon" component={Coming}>
+          <Coming />
+        </Route>
+        <Route path="/coming-soon/movie/:movieId" component={Coming}>
           <Coming />
         </Route>
         <Route path="/search">

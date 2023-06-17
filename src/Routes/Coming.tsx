@@ -230,11 +230,13 @@ function Coming () {
   const [leaving,setLeaving]=useState(false);
   const toggleLeaving=()=>setLeaving(prev=>!prev);
   const history=useHistory();
-  const bigMovieMatch=useRouteMatch<{movieId:string}>("/movies/:movieId");
+  const bigMovieMatch=useRouteMatch<{movieId:string}>("/coming-soon/movies/:movieId");
   const onBoxClicked=(movieId:number)=>{
-    history.push(`/movies/${movieId}`);
+    history.push(`/coming-soon/movies/${movieId}`);
   }
-  const onOverlayClick=()=>history.push("coming-soon");
+  const onOverlayClick=()=>{
+    history.push("/coming-soon");
+  }
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);

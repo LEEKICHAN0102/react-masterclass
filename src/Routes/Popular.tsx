@@ -213,15 +213,14 @@ const Overlay=styled(motion.div)`
   width:100%;
   height:100%;
   background-color:rgba(0,0,0,0.5);
-  opacity:0;
 `;
 
 
 function Popular () {
   const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","Popular"],getPopularMovies);
-  const trailerMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const id = trailerMatch?.params.movieId;
-  const {data:trailerData,isLoading:isTrailerLoading}=useQuery<IGetTrailerResult>(["movies","trailer",id],()=>getTrailerMovies(Number(id)));
+  // const trailerMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
+  // const id = trailerMatch?.params.movieId;
+  // const {data:trailerData,isLoading:isTrailerLoading}=useQuery<IGetTrailerResult>(["movies","trailer",id],()=>getTrailerMovies(Number(id)));
 
   const [index,setIndex]=useState(0);
   const [openMovie,setOpenMovie]=useState(false);
