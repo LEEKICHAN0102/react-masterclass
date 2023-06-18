@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {motion,useScroll,useMotionValueEvent,useAnimation} from "framer-motion";
-import {Link,  useRouteMatch } from "react-router-dom";
+import {Link, useHistory, useRouteMatch } from "react-router-dom";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -30,6 +30,7 @@ const Col = styled.div`
 `;
 
 const Logo = styled(motion.svg)`
+  cursor: pointer;
   margin-right: 50px;
   width: 95px;
   height: 25px;
@@ -84,6 +85,10 @@ const Circle = styled(motion.span)`
 
 
 function Header() {
+  const history=useHistory();
+  const goHome=()=>{
+    history.push("/");
+  }
   const homeMatch=useRouteMatch("/");
   const NowMatch=useRouteMatch("/now-playing");
   const ComingMatch=useRouteMatch("/coming-soon");
@@ -105,6 +110,7 @@ function Header() {
     >
       <Col>
         <Logo
+          onClick={goHome}
           variants={logoVariants}
           whileHover="active"
           initial="normal"
