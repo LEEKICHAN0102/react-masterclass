@@ -2,7 +2,6 @@ import { BrowserRouter as Router,Switch,Route } from "react-router-dom";
 import Popular from "./Routes/Popular";
 import Now from "./Routes/Now";
 import Coming from "./Routes/Coming";
-import Search from "./Routes/Search";
 import Header from "./Components/Header";
 
 
@@ -25,9 +24,6 @@ function App() {
         </Route>
         <Route path="/coming-soon/movie/:movieId" component={Coming}>
           <Coming />
-        </Route>
-        <Route path="/search">
-          <Search />
         </Route>
       </Switch>
     </Router>

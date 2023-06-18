@@ -66,7 +66,6 @@ const rowVariants={
   }
 }
 
-const offset=6;
 
 const Box = styled(motion.div)<{bgphoto:string}>`
   position: relative;
@@ -176,7 +175,7 @@ const BigTitle=styled.h3`
   font-size:28px;
   position:relative;
   z-index:1;
-  top:30%;
+  top:40%;
 `;
 
 const BigReleaseDate =styled.span`
@@ -184,7 +183,7 @@ const BigReleaseDate =styled.span`
   padding:20px;
   position:relative;
   z-index:1;
-  top:30%;
+  top:40%;
 `;
 
 
@@ -193,7 +192,7 @@ const BigOverView=styled.p`
   padding:20px;
   position:relative;
   z-index:1;
-  top:30%;
+  top:40%;
   width:85%;
 `;
 
@@ -202,7 +201,7 @@ const BigMovieDetails=styled.ul`
   padding:20px;
   position:relative;
   z-index:1;
-  top:25%;
+  top:35%;
   align-items:center;
 `;
 
@@ -251,21 +250,10 @@ function Popular() {
     ["movies", "trailer", id],
     () => getTrailerMovies(Number(id))
   );
-
-  const [index, setIndex] = useState(0);
+  
   const [openMovie, setOpenMovie] = useState(false);
-  const increaseIndex = () => {
-    if (data) {
-      if (leaving) return;
-      toggleLeaving();
-      const totalMovies = data.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
-  };
 
-  const [leaving, setLeaving] = useState(false);
-  const toggleLeaving = () => setLeaving((prev) => !prev);
+
   const history = useHistory();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
   const onBoxClicked = (movieId: number) => {
@@ -285,12 +273,12 @@ function Popular() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner onClick={increaseIndex} bgphoto={makeImagePath(data?.results[0].poster_path || "")}>
+          <Banner bgphoto={makeImagePath(data?.results[0].poster_path || "")}>
             <Title>{data?.results[0].title}</Title>
             <OverView>{data?.results[0].overview}</OverView>
           </Banner>
           <Slider>
-            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+            <AnimatePresence initial={false} >
               <Row
                 variants={rowVariants}
                 initial="hidden"
@@ -300,7 +288,6 @@ function Popular() {
                   duration: 1,
                 }}
                 exit="exit"
-                key={index}
               >
                 {data?.results.slice(1).map((movie) => (
                   <Box
@@ -357,8 +344,7 @@ function Popular() {
                         ) : (
                           <BigMovieDetails>
                             <BigMovieDetail>Original Language: {clickedMovie.original_language}</BigMovieDetail>
-                            <BigMovieDetail>Popularity: 💖 {clickedMovie.popularity}</BigMovieDetail>
-                            <BigMovieDetail>Movie's Runtime: {clickedMovie.runtime} Min</BigMovieDetail>
+                            <BigMovieDetail>Popularity: 💖 {Math.floor(clickedMovie.popularity)}</BigMovieDetail>
                             <BigMovieDetail>Vote Average: ⭐{clickedMovie.vote_average}</BigMovieDetail>
                             <BigMovieDetail>Vote Count: 🥰{clickedMovie.vote_count}</BigMovieDetail>
                             <BigMovieDetail>
