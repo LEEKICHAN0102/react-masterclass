@@ -2,9 +2,11 @@ import { useState} from "react";
 import styled from "styled-components";
 import {useQuery} from "react-query";
 import {motion,AnimatePresence} from "framer-motion";
-import {getNowMovies,IGetMoviesResult} from "../api";
+import {getNowMovies, IGetMoviesResult, getTrailerMovies, IGetTrailerResult} from "../api";
 import { makeImagePath } from "../utils";
 import {useRouteMatch, useHistory } from "react-router-dom";
+import YouTube from "react-youtube";
+
 
 const Wrapper=styled.div`
   background-color:black;
@@ -53,17 +55,16 @@ const Row=styled(motion.div)`
 `;
 
 const rowVariants={
-  hidden:{
-    x:window.outerWidth+5,
-  },
-  visible:{
-    x:0,
-  },
-  exit:{
-    x:-window.outerWidth-5
-  },
+  hidden: { opacity: 1, scale: 0 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delayChildren: 0.3,
+      staggerChildren: 0.2
+    }
+  }
 }
-
 
 const offset=6;
 
@@ -76,6 +77,7 @@ const Box = styled(motion.div)<{bgphoto:string}>`
   height:400px;
   color:white;
   border-radius:20px;
+  box-shadow: 0 2px 3px ${props=>props.theme.white.lighter};
   cursor:pointer;
   &:first-child{
     transform-origin:center left;
@@ -86,8 +88,10 @@ const Box = styled(motion.div)<{bgphoto:string}>`
 `;
 
 const boxVariants={
-  normal:{
-    scale:1,
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1
   },
   hover:{
     y:-50,
@@ -118,10 +122,11 @@ const infoVariants={
   }
 };
 
+
 const BigMovie=styled(motion.div)`
   position:fixed;
-  width:70vW;
-  height:85vh;
+  width:70%;
+  height:85%;
   background-color:${props=>props.theme.black.lighter};
   top:100px;
   left: 0;
@@ -129,6 +134,32 @@ const BigMovie=styled(motion.div)`
   margin:0 auto;
   border-radius:30px;
   overflow:hidden;
+`;
+
+const YouTubePlayerWrapper=styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: ${props => props.theme.black.lighter};
+`;
+
+const YouTubePlayer = styled(YouTube)`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+`;
+
+const YouTubeCancel=styled.span`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index:1;
 `;
 
 const BigCover=styled.div`
@@ -145,56 +176,52 @@ const BigTitle=styled.h3`
   font-size:28px;
   position:relative;
   z-index:1;
-  top:50%;
+  top:30%;
 `;
 
-const BigReleaseData =styled.span`
+const BigReleaseDate =styled.span`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:48%;
+  top:30%;
 `;
+
 
 const BigOverView=styled.p`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:50%;
-  width:100%;
+  top:30%;
+  width:85%;
 `;
 
-const BigMovieDetail=styled.div`
-  display:flex;
+const BigMovieDetails=styled.ul`
   color:${props=>props.theme.white.lighter};
   padding:20px;
   position:relative;
   z-index:1;
-  top:50%;
+  top:25%;
   align-items:center;
-  justify-content:space-evenly;
+`;
+
+const BigMovieDetail=styled.li`
+  color: ${(props) => props.theme.white.darker};
+  position:relative;
+  z-index:1;
+  align-items:center;
+  list-style-type:none;
 `;
 
 const BigMovieTrailer=styled(motion.div)`
   background-color:${props=>props.theme.white.lighter};
+  text-align:center;
+  margin-top:15px;
+  width:100%;
   position:relative;
   padding:20px;
   z-index:1;
-  top:50%;
-  border-radius:10px;
-  color:black;
-  font-size:20px;
-  font-weight:500;
-  cursor: pointer;
-`;
-
-const BigMovieMore=styled.div`
-    background-color:${props=>props.theme.white.lighter};
-  position:relative;
-  padding:20px;
-  z-index:1;
-  top:50%;
   border-radius:10px;
   color:black;
   font-size:20px;
@@ -210,115 +237,146 @@ const Overlay=styled(motion.div)`
   width:100%;
   height:100%;
   background-color:rgba(0,0,0,0.5);
-  opacity:0;
 `;
 
 
-function Now () {
-  const {data,isLoading}=useQuery<IGetMoviesResult>(["movies","now-playing"],getNowMovies);
-  const [index,setIndex]=useState(0);
-  const increaseIndex=()=>{
-    if(data){
-      if(leaving) return
-    toggleLeaving();
-    const totalMovies=data.results.length-1;
-    const maxIndex=Math.floor(totalMovies/offset)-1;
-    console.log(maxIndex);
-    setIndex((prev)=>prev === maxIndex?0:prev+1);
+
+
+
+function Popular() {
+  const { data, isLoading } = useQuery<IGetMoviesResult>(["movies", "now-playing"], getNowMovies);
+  const trailerMatch = useRouteMatch<{ movieId: string }>("/now-playing/movies/:movieId");
+  const id = trailerMatch?.params.movieId;
+  const { data: trailerData, isLoading: isTrailerLoading } = useQuery<IGetTrailerResult>(
+    ["movies", "trailer", id],
+    () => getTrailerMovies(Number(id))
+  );
+
+  const [index, setIndex] = useState(0);
+  const [openMovie, setOpenMovie] = useState(false);
+  const increaseIndex = () => {
+    if (data) {
+      if (leaving) return;
+      toggleLeaving();
+      const totalMovies = data.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
-  }
-  const [leaving,setLeaving]=useState(false);
-  const toggleLeaving=()=>setLeaving(prev=>!prev);
-  const history=useHistory();
-  const bigMovieMatch=useRouteMatch<{movieId:string}>("/now-playing/movies/:movieId");
-  const onBoxClicked=(movieId:number)=>{
-    history.push(`/now-playing/movies/${movieId}`);
-  }
-  const onOverlayClick=()=>{
-    history.push("/now-playing");
   };
+
+  const [leaving, setLeaving] = useState(false);
+  const toggleLeaving = () => setLeaving((prev) => !prev);
+  const history = useHistory();
+  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/now-playing/movies/:movieId");
+  const onBoxClicked = (movieId: number) => {
+    history.push(`/now-playing/movies/${movieId}`);
+  };
+  const onOverlayClick = () => {
+    history.push("/now-playing");
+    setOpenMovie(false);
+  }
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
 
   return (
     <Wrapper>
-      {isLoading?<Loader>Loading...</Loader>:
-      <>
-        <Banner onClick={increaseIndex} bgphoto={makeImagePath(data?.results[0].backdrop_path||"")}>
-          <Title>{data?.results[0].title}</Title>
-          <OverView>{data?.results[0].overview}</OverView>
-        </Banner>
-        <Slider>
-          <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-            <Row 
-              variants={rowVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{
-                type:"tween",
-                duration:1
-              }}
-              exit="exit"
-              key={index}>
-              {data?.results.slice(1).map((movie)=>
-              <Box 
-                layoutId={String(movie.id)}
-                key={movie.id} 
-                onClick={()=>onBoxClicked(movie.id)}
-                bgphoto={makeImagePath(movie.poster_path,"original")}
-                variants={boxVariants}
-                whileHover="hover"
-                initial="normal"
-                transition={{type:"tween"}}
-                >
-                  <Info variants={infoVariants}>
-                    <h4>{movie.title}</h4>
-                  </Info>
-                </Box>
-              )}
-            </Row>
-          </AnimatePresence>
-        </Slider>
-        <AnimatePresence>
-          {bigMovieMatch?(
-            <>
-              <Overlay 
-                onClick={onOverlayClick} 
-                animate={{opacity:1}}
-                exit={{opacity:0}} 
-              />
-              <BigMovie layoutId={bigMovieMatch.params.movieId} >
-                {clickedMovie && 
-                  <>
-                    <BigCover
-                        style={{
-                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMovie.backdrop_path,
-                            "original"
-                          )})`,
-                        }}
+      {isLoading ? (
+        <Loader>Loading...</Loader>
+      ) : (
+        <>
+          <Banner onClick={increaseIndex} bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}>
+            <Title>{data?.results[0].title}</Title>
+            <OverView>{data?.results[0].overview}</OverView>
+          </Banner>
+          <Slider>
+            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+              <Row
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  type: "tween",
+                  duration: 1,
+                }}
+                exit="exit"
+                key={index}
+              >
+                {data?.results.slice(1).map((movie) => (
+                  <Box
+                    layoutId={String(movie.id)}
+                    key={movie.id}
+                    onClick={() => onBoxClicked(movie.id)}
+                    bgphoto={makeImagePath(movie.poster_path, "original")}
+                    variants={boxVariants}
+                    whileHover="hover"
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ type: "tween" }}
+                  >
+                    <Info variants={infoVariants}>
+                      <h4>{movie.title}</h4>
+                    </Info>
+                  </Box>
+                ))}
+              </Row>
+            </AnimatePresence>
+          </Slider>
+          <AnimatePresence>
+            {bigMovieMatch ? (
+              <>
+                <Overlay onClick={onOverlayClick} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+                <BigMovie layoutId={bigMovieMatch.params.movieId}>
+                  {openMovie ? (
+                    <YouTubePlayerWrapper>
+                      <YouTubeCancel onClick={()=>setOpenMovie(false)}>❌</YouTubeCancel>
+                      <YouTubePlayer videoId={trailerData?.results[0].key}
+                      opts={{
+                        playerVars: {
+                          autoplay: 1,
+                        },
+                      }}
+                      />
+                    </YouTubePlayerWrapper>
+                  ) : (
+                    clickedMovie && (
+                      <>
+                        <BigCover
+                          style={{
+                            backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                              clickedMovie.backdrop_path,
+                              "original"
+                            )})`,
+                          }}
                         />
-                      <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigReleaseData>{clickedMovie.release_date}</BigReleaseData>
-                      <BigOverView>{clickedMovie.overview}</BigOverView>
-                      <BigMovieDetail>
-                        ⭐{clickedMovie.vote_average}
-                        🥰{clickedMovie.vote_count}
-                        <BigMovieTrailer> 🍟 Movie's Trailer!</BigMovieTrailer>
-                        <BigMovieMore> 🥤 More Information</BigMovieMore>
-                      </BigMovieDetail>
-                  </>
-                }
-              </BigMovie>
-            </> 
-            ) :null
-          }
-        </AnimatePresence>
-      </>
-      }
+                        <BigTitle>{clickedMovie.title}</BigTitle>
+                        <BigReleaseDate>{clickedMovie.release_date}</BigReleaseDate>
+                        <BigOverView>{clickedMovie.overview}</BigOverView>
+                        {isTrailerLoading ? (
+                          <Loader>Loading...</Loader>
+                        ) : (
+                          <BigMovieDetails>
+                            <BigMovieDetail>Original Language: {clickedMovie.original_language}</BigMovieDetail>
+                            <BigMovieDetail>Popularity: 💖 {clickedMovie.popularity}</BigMovieDetail>
+                            <BigMovieDetail>Movie's Runtime: {clickedMovie.runtime} Min</BigMovieDetail>
+                            <BigMovieDetail>Vote Average: ⭐{clickedMovie.vote_average}</BigMovieDetail>
+                            <BigMovieDetail>Vote Count: 🥰{clickedMovie.vote_count}</BigMovieDetail>
+                            <BigMovieDetail>
+                              <BigMovieTrailer onClick={() => setOpenMovie(true)}>🥤 Movie's Trailer!</BigMovieTrailer>
+                            </BigMovieDetail>
+                          </BigMovieDetails>
+                        )}
+                      </>
+                    )
+                  )}
+                </BigMovie>
+              </>
+            ) : null}
+          </AnimatePresence>
+        </>
+      )}
     </Wrapper>
-  )
+  );
 }
 
-export default Now;
+export default Popular;
